@@ -5,8 +5,8 @@ import com.ark.norns.entity.Sensor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
+import java.util.Set;
 
 public interface SensorRepository extends JpaRepository<Sensor, Long>, JpaSpecificationExecutor<Sensor> {
-    public List<Sensor> findAllByDevice(Device device);
+    public Set<Sensor> findAllByDevice(Device device);
 }

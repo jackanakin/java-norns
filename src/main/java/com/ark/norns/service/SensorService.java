@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -25,19 +25,19 @@ public class SensorService extends _Service<Sensor, Long> {
         super(sensorRepository);
     }
 
-    public List<Sensor> buildEntityList(List<SensorView> sensorViewList, Device device) {
-        List<Sensor> sensorList = new ArrayList<>();
+    public Set<Sensor> buildEntityList(Set<SensorView> sensorViewList, Device device) {
+        Set<Sensor> sensorList = new HashSet<>();
         for (SensorView sensorView : sensorViewList) {
             sensorList.add(sensorView.buildEntity(device));
         }
         return sensorList;
     }
 
-    public List<SensorView> buildViewList(List<Sensor> sensorList) {
+    public Set<SensorView> buildViewList(Set<Sensor> sensorList) {
         if (sensorList == null) {
             return null;
         } else {
-            List<SensorView> sensorViewList = new ArrayList<>();
+            Set<SensorView> sensorViewList = new HashSet<>();
             for (Sensor sensor : sensorList) {
                 sensorViewList.add(sensor.buildView());
             }

@@ -9,7 +9,6 @@ import com.ark.norns.service.SensorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/api/device/")
@@ -40,10 +39,9 @@ public class DeviceController {
     }
 
     @RequestMapping(value = "page", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public HttpEntity<Page<Device>> getPageable(@RequestParam int size, int page) {
+    public ResponseEntity getPageable(@RequestParam int size, int page) {
         Page<Device> listElements = deviceService.getDeviceRepository().findAll(new PageRequest(page, size));
-        HttpEntity<Page<Device>> entity = new HttpEntity<>(listElements);
-        return entity;
+        return ResponseEntity.status(HttpStatus.OK).body(listElements);
     }
 
     @RequestMapping(value = "save", method = RequestMethod.POST,
@@ -54,7 +52,7 @@ public class DeviceController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
         } else {
             Device device = deviceView.buildEntity(null);
-            List<Sensor> sensorList = sensorService.buildEntityList(deviceView.getSensorList(), null);
+            Set<Sensor> sensorList = sensorService.buildEntityList(deviceView.getSensorList(), null);
             device.setSensors(sensorList);
             device = deviceService.persistDevice(device);
 

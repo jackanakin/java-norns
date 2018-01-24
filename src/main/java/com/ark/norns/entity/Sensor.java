@@ -3,7 +3,6 @@ package com.ark.norns.entity;
 import com.ark.norns.entity.entityView.SensorView;
 import com.ark.norns.enumerated.Interval;
 import com.ark.norns.enumerated.Status;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
@@ -19,8 +18,7 @@ public class Sensor extends _Entity {
     @NotNull
     private Interval interval;
 
-    @ManyToOne
-    @NotNull
+    @JoinColumn(name = "device_id")
     private Device device;
 
     @Enumerated(EnumType.ORDINAL)
