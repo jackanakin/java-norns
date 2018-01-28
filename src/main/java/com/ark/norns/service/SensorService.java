@@ -1,10 +1,10 @@
 package com.ark.norns.service;
 
+import com.ark.norns.dao.SensorDAO;
 import com.ark.norns.entity.Device;
 import com.ark.norns.entity.Sensor;
 import com.ark.norns.entity.entityValidator.SensorValidator;
 import com.ark.norns.entity.entityView.SensorView;
-import com.ark.norns.repository.SensorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,16 +14,11 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class SensorService extends _Service<Sensor, Long> {
+public class SensorService {
     @Autowired
     private SensorValidator sensorValidator;
     @Autowired
-    private SensorRepository sensorRepository;
-
-    @Autowired
-    protected SensorService(SensorRepository sensorRepository) {
-        super(sensorRepository);
-    }
+    private SensorDAO sensorDAO;
 
     public Set<Sensor> buildEntityList(Set<SensorView> sensorViewList, Device device) {
         Set<Sensor> sensorList = new HashSet<>();
@@ -49,8 +44,8 @@ public class SensorService extends _Service<Sensor, Long> {
         return this.sensorValidator;
     }
 
-    public SensorRepository getSensorRepository() {
-        return (SensorRepository) super.getBaseRepository();
+    public SensorDAO getSensorDAO() {
+        return sensorDAO;
     }
 
 }

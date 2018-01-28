@@ -14,8 +14,8 @@ public class MyConfiguration {
         return new WebMvcConfigurerAdapter() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:3000")
+                registry.addMapping(NornsProperties.corsMapping)
+                        .allowedOrigins(NornsProperties.allowedOrigin)
                         .allowedMethods("GET", "POST")
                         .allowedHeaders("*")
                         .allowCredentials(false).maxAge(3600);
