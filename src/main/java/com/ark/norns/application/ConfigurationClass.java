@@ -7,15 +7,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
-public class MyConfiguration {
+public class ConfigurationClass {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurerAdapter() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping(NornsProperties.corsMapping)
-                        .allowedOrigins(NornsProperties.allowedOrigin)
+                registry.addMapping(Properties.corsMapping)
+                        .allowedOrigins(Properties.allowedOrigin)
                         .allowedMethods("GET", "POST")
                         .allowedHeaders("*")
                         .allowCredentials(false).maxAge(3600);

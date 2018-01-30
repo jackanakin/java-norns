@@ -3,7 +3,6 @@ package com.ark.norns.dao;
 import com.ark.norns.entity.Device;
 import com.ark.norns.entity.Sensor;
 import com.ark.norns.repository.DeviceRepository;
-import com.ark.norns.service.SensorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +23,7 @@ public class DeviceDAO extends _DAO<Device, Long>{
     }
 
     @Autowired
-    private SensorService sensorService;
+    private SensorDAO sensorDAO;
 
     public Device persistDevice(Device device) {
         List<Sensor> sensorList = new ArrayList<>(device.getSensors());
@@ -33,7 +32,7 @@ public class DeviceDAO extends _DAO<Device, Long>{
             for (Sensor sensor : sensorList) {
                 sensor.setDevice(device);
             }
-            sensorService.getSensorDAO().saveAll(sensorList);
+            sensorDAO.saveAll(sensorList);
         }
         return device;
     }

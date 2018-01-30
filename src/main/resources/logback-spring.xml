@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOG_PATH" value="/home/jardel/git/logging/"/>
-
+    <property file="src/main/resources/application.properties" />
 
     <appender name="SPRING_BOOT" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/spring/spring.log</file>
+        <file>${norns.resource-path}/spring/spring.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
                 %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n
@@ -19,42 +18,42 @@
     </appender>
 
     <appender name="EXCEPTION_HANDLER" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/error/error.log</file>
+        <file>${norns.resource-path}/error/error.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
                 %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n
             </Pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/archived/error_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+            <fileNamePattern>${norns.resource-path}/archived/error_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
             <maxHistory>10</maxHistory>
             <maxFileSize>10MB</maxFileSize>
             <totalSizeCap>100MB</totalSizeCap>
         </rollingPolicy>
     </appender>
     <appender name="AUDIT" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/audit/audit.log</file>
+        <file>${norns.resource-path}/audit/audit.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
                 %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n
             </Pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/archived/audit_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+            <fileNamePattern>${norns.resource-path}/archived/audit_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
             <maxHistory>30</maxHistory>
             <maxFileSize>30MB</maxFileSize>
             <totalSizeCap>300MB</totalSizeCap>
         </rollingPolicy>
     </appender>
     <appender name="ADMIN" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/admin/admin.log</file>
+        <file>${norns.resource-path}/admin/admin.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
                 %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n
             </Pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/archived/admin_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+            <fileNamePattern>${norns.resource-path}/archived/admin_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
             <maxHistory>30</maxHistory>
             <maxFileSize>30MB</maxFileSize>
             <totalSizeCap>300MB</totalSizeCap>

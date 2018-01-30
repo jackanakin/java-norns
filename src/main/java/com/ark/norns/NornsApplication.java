@@ -1,6 +1,6 @@
 package com.ark.norns;
 
-import com.ark.norns.application.NornsProperties;
+import com.ark.norns.application.Properties;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.logging.Logger;
 
 @SpringBootApplication
-@EnableConfigurationProperties(NornsProperties.class)
+@EnableConfigurationProperties(Properties.class)
 public class NornsApplication {
-    static Logger log = Logger.getLogger(NornsProperties.class.getName());
+    static Logger log = Logger.getLogger(Properties.class.getName());
 
     public static void main(String[] args) {
         SpringApplication.run(NornsApplication.class, args);
@@ -23,9 +23,8 @@ public class NornsApplication {
         @Override
         public void run(String... strings) throws Exception {
             log.info("-----------------------------------------");
-            log.info("App Name: " + NornsProperties.applicationName);
-            log.info("App Data Source: " + NornsProperties.datasourceUrl);
-            log.info("App Data Source Password Encryption: " + NornsProperties.datasourcePasswordEncryption);
+            log.info("App Name: " + Properties.applicationName);
+            log.info("App Data Source: " + Properties.datasourceUrl);
             log.info("-----------------------------------------");
         }
     }
