@@ -15,6 +15,10 @@ public class SifCollectorService {
     @Autowired
     private SifCollectorDAO sifCollectorDAO;
 
+    public void removeEntity(Long id){
+        getSifCollectorDAO().delete(getSifCollectorDAO().findOne(id));
+    }
+
     public SifCollector persistEntity(SifCollector sifCollector) {
         return getSifCollectorDAO().save(sifCollector);
     }

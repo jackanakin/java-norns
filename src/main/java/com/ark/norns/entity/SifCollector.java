@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
-@Table(name = "cfg_collector")
+@Table(name = "sif_collector")
 public class SifCollector extends _Entity {
     @NotNull
     private String identifier;
@@ -18,7 +18,7 @@ public class SifCollector extends _Entity {
     @Column(name = "database_url")
     private String databaseUrl;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     @NotNull
     private Status status;
 

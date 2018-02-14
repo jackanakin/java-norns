@@ -22,7 +22,7 @@ public class SifCollectorView extends _View {
         this.status_name = status_name;
     }
 
-    public SifCollector buildEntity(SifCollectorView sifCollectorView) {
+    public SifCollector buildEntity() {
         return new SifCollector(getId(), getIdentifier(), getDescription(), getDatabaseUrl(), isStatus() ? Status.ENABLED : Status.DISABLED);
     }
 

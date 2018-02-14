@@ -2,13 +2,13 @@ package com.ark.norns.entity;
 
 import com.ark.norns.entity.entityView.DeviceView;
 import com.ark.norns.entity.entityView.SensorView;
-import com.ark.norns.enumerated.SNMPV;
+import com.ark.norns.enumerated.SNMPVersion;
 import com.ark.norns.enumerated.Status;
 import com.sun.istack.internal.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "device")
@@ -21,21 +21,34 @@ public class Device extends _Entity {
     @Nullable
     private String description;
 
-    @OneToMany
-    @Transient
+    @NotNull
+    @JoinColumn(name = "sif_collector_id")
+    @ManyToOne
+    private SifCollector sifCollector;
+
+    @JoinColumn(name = "authentication_profile_id")
+    @ManyToOne
+    private DeviceAuthenticationProfile deviceAuthenticationProfile;
+
+    @JoinColumn(name = "community_profile_id")
+    @ManyToOne
+    private DeviceCommunityProfile deviceCommunityProfile;
+
+    @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, targetEntity = Sensor.class)
     private Set<Sensor> sensors;
 
     @Enumerated(EnumType.ORDINAL)
-    private SNMPV snmpv;
+    private SNMPVersion snmpv;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     @NotNull
     private Status status;
 
     public Device() {
     }
 
-    public Device(Long id, String ipv4, int port, String description, Set<Sensor> sensors, Status status, SNMPV snmpv) {
+    public Device(Long id, String ipv4, int port, String description, Set<Sensor> sensors, Status status,
+                  SNMPVersion snmpv) {
         setId(id);
         this.ipv4 = ipv4;
         this.port = port;
@@ -46,8 +59,7 @@ public class Device extends _Entity {
     }
 
     public DeviceView buildView(Set<SensorView> sensorViewList) {
-        return new DeviceView(getId(), getIpv4(), getPort(), snmpv.name(), snmpv.getName(), getDescription(),
-                getStatus().equals(Status.ENABLED) ? true : false, sensorViewList);
+        return new DeviceView(this, sensorViewList);
     }
 
     public String getIpv4() {
@@ -90,11 +102,35 @@ public class Device extends _Entity {
         this.sensors = sensors;
     }
 
-    public SNMPV getSnmpv() {
+    public SNMPVersion getSnmpv() {
         return snmpv;
     }
 
-    public void setSnmpv(SNMPV snmpv) {
+    public void setSnmpv(SNMPVersion snmpv) {
         this.snmpv = snmpv;
+    }
+
+    public SifCollector getSifCollector() {
+        return sifCollector;
+    }
+
+    public void setSifCollector(SifCollector sifCollector) {
+        this.sifCollector = sifCollector;
+    }
+
+    public DeviceAuthenticationProfile getDeviceAuthenticationProfile() {
+        return deviceAuthenticationProfile;
+    }
+
+    public void setDeviceAuthenticationProfile(DeviceAuthenticationProfile deviceAuthenticationProfile) {
+        this.deviceAuthenticationProfile = deviceAuthenticationProfile;
+    }
+
+    public DeviceCommunityProfile getDeviceCommunityProfile() {
+        return deviceCommunityProfile;
+    }
+
+    public void setDeviceCommunityProfile(DeviceCommunityProfile deviceCommunityProfile) {
+        this.deviceCommunityProfile = deviceCommunityProfile;
     }
 }

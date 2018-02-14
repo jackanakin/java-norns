@@ -2,7 +2,8 @@ package com.ark.norns.entity.entityView;
 
 import com.ark.norns.entity.Device;
 import com.ark.norns.entity.Sensor;
-import com.ark.norns.enumerated.SNMPV;
+import com.ark.norns.entity.SifCollector;
+import com.ark.norns.enumerated.SNMPVersion;
 import com.ark.norns.enumerated.Status;
 
 import java.util.Set;
@@ -10,29 +11,35 @@ import java.util.Set;
 public class DeviceView extends _View {
     private String ipv4;
     private Integer port;
+    private String description;
+    private Long sifCollectorId;
+    private Long authenticatioProfileId;
+    private Long communityProfileId;
     private String snmp;
     private String snmp_name;
-    private String description;
     private boolean status;
     private Set<SensorView> sensorList;
 
     public DeviceView() {
     }
 
-    public DeviceView(Long id, String ipv4, Integer port, String snmp, String snmp_name, String description, boolean status, Set<SensorView> sensorList) {
-        setId(id);
-        this.ipv4 = ipv4;
-        this.port = port;
-        this.snmp = snmp;
-        this.snmp_name = snmp_name;
-        this.description = description;
-        this.status = status;
+    public DeviceView(Device device, Set<SensorView> sensorList) {
+        setId(device.getId());
+        this.ipv4 = device.getIpv4();
+        this.port = device.getPort();
+        this.snmp = device.getSnmpv().name();
+        this.snmp_name = device.getSnmpv().getName();
+        this.description = device.getDescription();
+        this.status = device.getStatus().equals(Status.ENABLED) ? true : false;
         this.sensorList = sensorList;
+        this.sifCollectorId = device.getSifCollector() != null ? device.getSifCollector().getId() : 0;
+        this.authenticatioProfileId = device.getDeviceAuthenticationProfile() != null ? device.getDeviceAuthenticationProfile().getId() : 0;
+        this.communityProfileId = device.getDeviceCommunityProfile() != null ? device.getDeviceCommunityProfile().getId() : 0;
     }
 
-    public Device buildEntity(Set<Sensor> sensorList) {
-        return new Device(getId(), getIpv4(), getPort(), getDescription(), sensorList,
-                isStatus() ? Status.ENABLED : Status.DISABLED, SNMPV.valueOf(getSnmp()));
+    public Device buildEntity() {
+        return new Device(getId(), getIpv4(), getPort(), getDescription(), null,
+                isStatus() ? Status.ENABLED : Status.DISABLED, SNMPVersion.valueOf(getSnmp()));
     }
 
     public String getIpv4() {
@@ -89,5 +96,29 @@ public class DeviceView extends _View {
 
     public void setSnmp_name(String snmp_name) {
         this.snmp_name = snmp_name;
+    }
+
+    public Long getSifCollectorId() {
+        return sifCollectorId;
+    }
+
+    public void setSifCollectorId(Long sifCollectorId) {
+        this.sifCollectorId = sifCollectorId;
+    }
+
+    public Long getAuthenticatioProfileId() {
+        return authenticatioProfileId;
+    }
+
+    public void setAuthenticatioProfileId(Long authenticatioProfileId) {
+        this.authenticatioProfileId = authenticatioProfileId;
+    }
+
+    public Long getCommunityProfileId() {
+        return communityProfileId;
+    }
+
+    public void setCommunityProfileId(Long communityProfileId) {
+        this.communityProfileId = communityProfileId;
     }
 }

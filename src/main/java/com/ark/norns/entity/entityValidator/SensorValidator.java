@@ -1,6 +1,7 @@
 package com.ark.norns.entity.entityValidator;
 
 import com.ark.norns.entity.entityView.SensorView;
+import com.ark.norns.enumerated.IntervalKind;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -24,8 +25,10 @@ public class SensorValidator implements Validator {
         if (sensor.getOid() == null || sensor.getOid().length() <= 1) {
             errors.reject("sensor_oid", "O campo 'OID' deve ser maior que 1 (hum)");
         }
-        if (sensor.getInterval() == null || sensor.getInterval().length() <= 0) {
-            errors.reject("sensor_interval", "Deve ser selecionado o 'Intervalo'");
+        if (IntervalKind.valueOf(sensor.getInterval()).equals(IntervalKind.PER_HOUR) && (sensor.getTime() < 1 || sensor.getTime() > 24)) {
+            errors.reject("sensor_time", "O campo 'Tempo' deve ser possuir um tempo válido");
+        } else if (sensor.getTime() < 1 || sensor.getTime() > 60) {
+            errors.reject("sensor_time", "O campo 'Tempo' deve ser possuir um tempo válido");
         }
     }
 }

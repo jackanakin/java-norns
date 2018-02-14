@@ -27,13 +27,13 @@ public class DeviceDAO extends _DAO<Device, Long>{
 
     public Device persistDevice(Device device) {
         List<Sensor> sensorList = new ArrayList<>(device.getSensors());
-        device = this.save(device);
         if (sensorList != null) {
             for (Sensor sensor : sensorList) {
                 sensor.setDevice(device);
             }
-            sensorDAO.saveAll(sensorList);
+            //sensorDAO.saveAll(sensorList);
         }
+        device = this.save(device);
         return device;
     }
 }

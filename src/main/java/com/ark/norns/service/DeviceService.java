@@ -37,4 +37,9 @@ public class DeviceService {
     public DeviceValidator getDeviceValidator() {
         return this.deviceValidator;
     }
+
+    public DeviceDAO getDeviceDAO() {
+        return this.deviceDAO;
+    }
+
 }

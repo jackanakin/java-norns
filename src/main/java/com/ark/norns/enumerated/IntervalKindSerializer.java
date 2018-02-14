@@ -7,17 +7,17 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
 
-public class SNMPVSerializer extends StdSerializer<SNMPV> {
-    public SNMPVSerializer() {
-        super(SNMPV.class);
+public class IntervalKindSerializer extends StdSerializer<IntervalKind> {
+    public IntervalKindSerializer() {
+        super(IntervalKind.class);
     }
 
-    public void serialize(SNMPV snmpv, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonProcessingException {
+    public void serialize(IntervalKind interval, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonProcessingException {
         generator.writeStartObject();
         generator.writeFieldName("id");
-        generator.writeString(snmpv.name());
+        generator.writeString(interval.name());
         generator.writeFieldName("name");
-        generator.writeString(snmpv.getName());
+        generator.writeString(interval.getName());
         generator.writeEndObject();
     }
 }

@@ -23,7 +23,13 @@ public class DeviceValidator implements Validator {
             errors.reject("device_ipv4", "O campo 'Endereço IPv4' deve ser um endereço IPv4 válido!");
         }
         if (deviceView.getPort() == null || deviceView.getPort() <= 0) {
-            errors.reject("device_port", "O campo 'Porta (SNMP)' deve ser maior que 0 (zero)");
+            errors.reject("device_port", "O campo 'Porta (SNMP)' deve ser maior que 0 (zero)!");
+        }
+        if (deviceView.getSifCollectorId() == null || deviceView.getSifCollectorId() == 0) {
+            errors.reject("device_sifCollectorId", "Deve ser selecionado o 'Coletor!'");
+        }
+        if (deviceView.getSnmp() == null || deviceView.getSnmp().length() <= 0) {
+            errors.reject("device_snmp", "Deve ser selecionado o 'Protocolo SNMP'!");
         }
     }
 }

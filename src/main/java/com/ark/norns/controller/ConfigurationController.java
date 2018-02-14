@@ -3,20 +3,20 @@ package com.ark.norns.controller;
 import com.ark.norns.application.Properties;
 import com.ark.norns.entity.SifCollector;
 import com.ark.norns.entity.entityView.SifCollectorView;
+import com.ark.norns.enumerated.Status;
 import com.ark.norns.service.SifCollectorService;
+import com.ark.norns.specification.SifCollectorSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Iterator;
 
 @RestController
 @RequestMapping(value = "/api/configuration/")
@@ -24,16 +24,30 @@ public class ConfigurationController {
     @Autowired
     private SifCollectorService sifCollectorService;
 
-    @RequestMapping(value = "list-all", method = RequestMethod.GET,
+    @RequestMapping(value = "remove-collector", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity removeCollector(@RequestParam Long id) {
+        sifCollectorService.removeEntity(id);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @RequestMapping(value = "listFilter-sifcollector", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity listAllInterval() {
-        Set<SifCollectorView> sifCollectorViewSet = new HashSet<>();
-        sifCollectorService.getSifCollectorDAO().findAll().stream().forEach(
-                sifCollector -> {
-                    sifCollectorViewSet.add(sifCollector.buildView());
-                }
-        );
-        return ResponseEntity.status(HttpStatus.OK).body(sifCollectorViewSet);
+    public ResponseEntity listFilterSifCollector() {
+        Specification<SifCollector> specification = SifCollectorSpecification.selectMenuFilter(Status.ENABLED);
+
+        Iterator<SifCollector> sifCollectorSet = sifCollectorService.getSifCollectorDAO().getSifCollectorRepository()
+                .findAll(specification, new Sort(Sort.Direction.ASC, "description")).iterator();
+
+        return ResponseEntity.status(HttpStatus.OK).body(sifCollectorSet);
+    }
+
+    @RequestMapping(value = "list-sifcollector", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity listAllSifCollector() {
+        Iterator<SifCollector> sifCollectorSet = sifCollectorService.getSifCollectorDAO().getSifCollectorRepository()
+                .findAll(new Sort(Sort.Direction.ASC, "description")).iterator();
+
+        return ResponseEntity.status(HttpStatus.OK).body(sifCollectorSet);
     }
 
     @RequestMapping(value = "save-collector", method = RequestMethod.POST,
@@ -43,13 +57,13 @@ public class ConfigurationController {
         if (result.hasErrors()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
         } else {
-            SifCollector sifCollector = sifCollectorView.buildEntity(sifCollectorView);
+            SifCollector sifCollector = sifCollectorView.buildEntity();
             sifCollector = sifCollectorService.persistEntity(sifCollector);
 
             if (sifCollector == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             } else {
-                return ResponseEntity.status(HttpStatus.OK).body(sifCollector.buildView());
+                return ResponseEntity.status(HttpStatus.OK).body(sifCollector);
             }
         }
     }

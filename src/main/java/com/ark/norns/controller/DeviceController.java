@@ -4,8 +4,7 @@ import com.ark.norns.entity.Device;
 import com.ark.norns.entity.Sensor;
 import com.ark.norns.entity.entityView.DeviceView;
 import com.ark.norns.entity.entityView.SensorView;
-import com.ark.norns.service.DeviceService;
-import com.ark.norns.service.SensorService;
+import com.ark.norns.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -26,6 +26,15 @@ public class DeviceController {
 
     @Autowired
     private SensorService sensorService;
+
+    @Autowired
+    private SifCollectorService sifCollectorService;
+
+    @Autowired
+    private DeviceAuthenticationProfileService authenticationProfileService;
+
+    @Autowired
+    private DeviceCommunityProfileService communityProfileService;
 
     @RequestMapping(value = "getById", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity get(@RequestParam Long id) {
@@ -39,9 +48,12 @@ public class DeviceController {
     }
 
     @RequestMapping(value = "page", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getPageable(@RequestParam int size, int page) {
+    public Page<Device> getPageable(@RequestParam int size, int page) {
         Page<Device> listElements = deviceService.getDeviceRepository().findAll(new PageRequest(page, size));
-        return ResponseEntity.status(HttpStatus.OK).body(listElements);
+        for (Device device: listElements.getContent()){
+            device.setSensors(null);
+        }
+        return listElements;
     }
 
     @RequestMapping(value = "save", method = RequestMethod.POST,
@@ -51,9 +63,17 @@ public class DeviceController {
         if (result.hasErrors()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
         } else {
-            Device device = deviceView.buildEntity(null);
+            Device device = deviceView.buildEntity();
             Set<Sensor> sensorList = sensorService.buildEntityList(deviceView.getSensorList(), null);
             device.setSensors(sensorList);
+            device.setSifCollector(sifCollectorService.getSifCollectorDAO().findOne(deviceView.getSifCollectorId()));
+
+            if (deviceView.getAuthenticatioProfileId() != null) {
+                device.setDeviceAuthenticationProfile(authenticationProfileService.getDeviceAuthenticationProfileDAO().findOne(deviceView.getAuthenticatioProfileId()));
+            }
+            if (deviceView.getCommunityProfileId() != null) {
+                device.setDeviceCommunityProfile(communityProfileService.getDeviceCommunityProfileDAO().findOne(deviceView.getCommunityProfileId()));
+            }
             device = deviceService.persistDevice(device);
 
             if (device == null) {

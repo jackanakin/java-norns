@@ -1,8 +1,10 @@
 package com.ark.norns.entity;
 
 import com.ark.norns.entity.entityView.SensorView;
-import com.ark.norns.enumerated.Interval;
+import com.ark.norns.enumerated.IntervalKind;
+import com.ark.norns.enumerated.SensorKind;
 import com.ark.norns.enumerated.Status;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
@@ -11,34 +13,49 @@ import javax.validation.constraints.NotNull;
 public class Sensor extends _Entity {
     @NotNull
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    private SensorKind sensorKind;
+
+    private String description;
+
     @NotNull
     private String oid;
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private Interval interval;
+    private IntervalKind interval;
 
+    @NotNull
+    private Long time;
+
+    @ManyToOne(targetEntity = Device.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "device_id")
     private Device device;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     @NotNull
     private Status status;
 
     public Sensor() {
     }
 
-    public Sensor(Long id, String name, String oid, Device device, Interval interval, Status status) {
+    public Sensor(Long id, String name, String oid, Device device, IntervalKind interval, Status status, SensorKind sensorKind,
+                  String description, Long time) {
         setId(id);
         this.name = name;
         this.oid = oid;
         this.device = device;
         this.interval = interval;
         this.status = status;
+        this.sensorKind = sensorKind;
+        this.description = description;
+        this.time = time;
     }
 
     public SensorView buildView() {
-        return new SensorView(getId(), getName(), getOid(), getInterval().name(), getInterval().getName(), getStatus().equals(Status.ENABLED) ? true : false, getStatus().getName());
+        return new SensorView(getId(), getName(), getOid(), getInterval().name(), getStatus().equals(Status.ENABLED) ? true : false, getStatus().getName(),
+                sensorKind == null ? null : sensorKind.name(), getDescription(), getTime(), getInterval().getShortened());
     }
 
     public String getName() {
@@ -57,11 +74,11 @@ public class Sensor extends _Entity {
         this.oid = oid;
     }
 
-    public Interval getInterval() {
+    public IntervalKind getInterval() {
         return interval;
     }
 
-    public void setInterval(Interval interval) {
+    public void setInterval(IntervalKind interval) {
         this.interval = interval;
     }
 
@@ -79,5 +96,29 @@ public class Sensor extends _Entity {
 
     public void setDevice(Device device) {
         this.device = device;
+    }
+
+    public SensorKind getSensorKind() {
+        return sensorKind;
+    }
+
+    public void setSensorKind(SensorKind sensorKind) {
+        this.sensorKind = sensorKind;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getTime() {
+        return time;
+    }
+
+    public void setTime(Long time) {
+        this.time = time;
     }
 }
