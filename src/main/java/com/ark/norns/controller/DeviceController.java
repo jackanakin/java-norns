@@ -1,10 +1,13 @@
 package com.ark.norns.controller;
 
+import com.ark.norns.application.Logging;
+import com.ark.norns.application.SnmpManager;
 import com.ark.norns.entity.Device;
 import com.ark.norns.entity.Sensor;
 import com.ark.norns.entity.entityView.DeviceView;
 import com.ark.norns.entity.entityView.SensorView;
 import com.ark.norns.service.*;
+import org.snmp4j.smi.VariableBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +38,9 @@ public class DeviceController {
 
     @Autowired
     private DeviceCommunityProfileService communityProfileService;
+
+    @Autowired
+    private SnmpManager snmpManager;
 
     @RequestMapping(value = "getById", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity get(@RequestParam Long id) {
@@ -94,5 +100,27 @@ public class DeviceController {
             sensorView.buildView();
             return ResponseEntity.status(HttpStatus.OK).body(sensorView);
         }
+    }
+
+    @RequestMapping(value = "scan-device", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity scanDevice(@Valid @RequestBody DeviceView deviceView, BindingResult result) {
+        deviceService.getDeviceValidator().validateSnmpScanner(deviceView, result);
+        if (result.hasErrors()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
+        } else {
+            Device device = deviceView.buildEntity();
+            try {
+                List<VariableBinding> walkedDeviceList = snmpManager.doWalk(device);
+                long startTime = System.nanoTime();
+                snmpManager.translateVariableBindingIntoMibFileOid(walkedDeviceList);
+                long endTime = System.nanoTime();
+                long duration = (endTime - startTime);
+                System.out.println(".:"+(duration/1000000));
+            }catch (Exception e){
+                Logging.errorLog(this.getClass(), e.getMessage());
+            }
+        }
+        return null;
     }
 }

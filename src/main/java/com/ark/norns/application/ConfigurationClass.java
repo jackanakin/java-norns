@@ -16,7 +16,7 @@ public class ConfigurationClass {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping(Properties.corsMapping)
                         .allowedOrigins(Properties.allowedOrigin)
-                        .allowedMethods("GET", "POST")
+                        .allowedMethods("GET", "POST", "PUT")
                         .allowedHeaders("*")
                         .allowCredentials(false).maxAge(3600);
             }

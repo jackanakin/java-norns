@@ -13,6 +13,31 @@ public class Properties {
     public static String corsMapping = null;
     public static String allowedOrigin = null;
     public static String resourcePath = null;
+    public static String mibFilesPath = null;
+    public static Integer snmpWalkRetries = null;
+    public static Long snmpWalkTimeout = null;
+    public static String snmpWalkOidStart = null;
+    public static Long snmpWalkVersion = null;
+
+    public static void setSnmpWalkVersion(Long snmpWalkVersion) {
+        Properties.snmpWalkVersion = snmpWalkVersion;
+    }
+
+    public static void setSnmpWalkOidStart(String snmpWalkOidStart) {
+        Properties.snmpWalkOidStart = snmpWalkOidStart;
+    }
+
+    public static void setSnmpWalkRetries(Integer snmpWalkRetries) {
+        Properties.snmpWalkRetries = snmpWalkRetries;
+    }
+
+    public static void setSnmpWalkTimeout(Long snmpWalkTimeout) {
+        Properties.snmpWalkTimeout = snmpWalkTimeout;
+    }
+
+    public static void setMibFilesPath(String mibFilesPath) {
+        Properties.mibFilesPath = mibFilesPath;
+    }
 
     public static void updatePropertie(String propertie, String value) {
         try {
@@ -22,7 +47,7 @@ public class Properties {
             config.setProperty(propertie, value);
             config.save();
 
-            Logging.admin.info("Config Property Updated by " + "@Usuário x");
+            Logging.adminLog(Properties.class, "Config Property Updated by " + "@Usuário x");
         } catch (Exception e) {
             Logging.error.error(e.getMessage());
             e.printStackTrace();
