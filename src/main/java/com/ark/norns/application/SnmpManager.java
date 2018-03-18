@@ -6,7 +6,6 @@ import com.ark.norns.dataStructure.TreeNode;
 import com.ark.norns.entity.Device;
 import com.ark.norns.service.MibFileService;
 import com.ark.norns.specification.MibFileSpecification;
-import javafx.util.Pair;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.Snmp;
 import org.snmp4j.TransportMapping;
@@ -29,25 +28,41 @@ public class SnmpManager {
     @Autowired
     private MibFileService mibFileService;
 
+    @Autowired
+    private MibManager mibManager;
+
     public void translateVariableBindingIntoMibFileOid(List<VariableBinding> list) {
         List<MibFile> mibFiles = mibFileService.getMibFileDAO().getMibFileRepository().findAll(MibFileSpecification.translateVariableBindingIntoMibFileOid());
         Collections.sort(mibFiles, MibFile.ROOT_OID_DESC);
-        List<Pair<MibFile, Boolean>> mibFileCache = new ArrayList<>();
+        TreeNode<Integer, String, MibFileOid> root = mibManager.initializeYggdrasil(new TreeNode(1, "1", new MibFileOid("1", "iso", new MibFile(Properties.mibFileRoot)), 0));
+        Set<MibFile> cachedMibFile = new HashSet<>();
 
-        TreeNode<Integer, String, MibFileOid> root = MibManager.initializeYggdrasil(new TreeNode(1, "1", new MibFileOid("1", "iso", MibManager.yggdrasil), 0));
+        long start = System.currentTimeMillis();
+        OID_LOOP:
         for (VariableBinding var : list) {
             for (MibFile mibVar : mibFiles) {
                 if (var.getOid().toString().startsWith(mibVar.getRootOID())) {
-                    if (!mibFileCache.contains(mibVar)){
-
+                    // Carrega os identificadores dos arquivos mib necessários na àrvore
+                    if (!cachedMibFile.contains(mibVar)){
+                        Set<MibFile> newCache = mibManager.loadMibIndexes(new HashSet<>(Arrays.asList(mibVar)), cachedMibFile, root);
+                        if (newCache.size() > 0){
+                            cachedMibFile.addAll(newCache);
+                            if (cachedMibFile.contains(mibVar)) {
+                                root = mibManager.populateIanaTree(mibVar.getModules(), mibVar, root);
+                                if (mibVar.getRootOID() != null) {
+                                    root = mibManager.listMibFileObjectType(mibVar, root);
+                                }
+                            }
+                        }
                     }
-                    System.out.println(var.getOid().toString() + ": " + mibVar.getRootOID());
-                    break;
-                    /// carregar mib file objects em root tree
-                    /// pesquisar na root tree o oid atual
+
+                    return;
                 }
             }
         }
+
+        long end = System.currentTimeMillis();
+        System.out.println("Tempo: " + (end-start));
     }
 
     public List<VariableBinding> doWalk(Device device) throws IOException {
@@ -91,9 +106,6 @@ public class SnmpManager {
         return snmpItemList;
     }
 
-    /////////////////////
-    ////////////
-    /////////
     public CommunityTarget createTarget(Device device) {
         CommunityTarget target = new CommunityTarget();
 

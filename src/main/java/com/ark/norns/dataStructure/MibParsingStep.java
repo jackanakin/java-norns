@@ -1,5 +1,9 @@
 package com.ark.norns.dataStructure;
 
 public enum MibParsingStep {
-    initializeImports, findImports, findModuleIdentity, findModuleIdentityValue, findObjectIdentifier;
+    // find OBJECT IDENTIFIER, MODULE IDENTITY, IMPORT DEPENDENCIES
+    initializeImports, findImports, findModuleIdentity, findModuleIdentityValue, findObjectIdentifier, findSequenceObjects, findTextualConvention,
+    // find OBJECT-TYPE
+    findObjectType, findObjectTypeSyntax, findObjectTypeAccess, findObjectTypeStatus, findObjectTypeDescription, findingObjectTypeDescription, findObjectTypeIdentity;
+    ;
 }

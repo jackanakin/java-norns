@@ -7,6 +7,7 @@ public class TreeNode<K, P, D> implements Comparable<TreeNode<K, P, D>> {
     K key;
     P path;
     int rank;
+    boolean isLeaf = false;
     TreeNode<K, P, D> parent;
     TreeSet<TreeNode<K, P, D>> children;
 
@@ -15,6 +16,15 @@ public class TreeNode<K, P, D> implements Comparable<TreeNode<K, P, D>> {
         this.data = d;
         this.key = key;
         this.path = path;
+        this.children = new TreeSet<TreeNode<K, P, D>>();
+    }
+
+    public TreeNode(K key, P path, D d, int r, boolean isLeaf) {
+        this.rank = rank;
+        this.data = d;
+        this.key = key;
+        this.path = path;
+        this.isLeaf = isLeaf;
         this.children = new TreeSet<TreeNode<K, P, D>>();
     }
 
@@ -27,6 +37,21 @@ public class TreeNode<K, P, D> implements Comparable<TreeNode<K, P, D>> {
             return tNode;
         } else {
             tNode = new TreeNode<K, P, D>(k, p, d, this.rank++);
+            tNode.parent = this;
+            this.children.add(tNode);
+            return tNode;
+        }
+    }
+
+    public TreeNode<K, P, D> addChildren(K k, P p, D d, boolean isLeaf) {
+        TreeNode<K, P, D> tNode = children.stream().filter(
+                node -> node.getKey() == k
+        ).findFirst().orElse(null);
+
+        if (tNode != null) {
+            return tNode;
+        } else {
+            tNode = new TreeNode<K, P, D>(k, p, d, this.rank++, isLeaf);
             tNode.parent = this;
             this.children.add(tNode);
             return tNode;
@@ -47,6 +72,35 @@ public class TreeNode<K, P, D> implements Comparable<TreeNode<K, P, D>> {
             }
         }
         return null;
+    }
+
+    public TreeNode<K, P, D> findParentNodeByOid(String oid) {
+        for (TreeNode<K, P, D> node : this.children) {
+            MibFileOid mibFileOid = (MibFileOid) node.getData();
+            if (mibFileOid != null && mibFileOid.getOid() != null &&
+                    mibFileOid.getOid().equals(oid)) {
+                return node;
+            } else if (node.children.size() > 0) {
+                TreeNode<K, P, D> childNode = node.findParentNodeByOid(oid);
+                if (childNode != null) {
+                    return childNode;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void replaceNodeByOid(String oid, TreeNode<K, P, D> toReplace) {
+        for (TreeNode<K, P, D> node : this.children) {
+            MibFileOid mibFileOid = (MibFileOid) node.getData();
+            if (mibFileOid != null && mibFileOid.getOid() != null &&
+                    mibFileOid.getOid().equals(oid)) {
+                node = toReplace;
+                break;
+            } else if (node.children.size() > 0) {
+                node.replaceNodeByOid(oid, toReplace);
+            }
+        }
     }
 
     public void printAll() {
@@ -118,5 +172,13 @@ public class TreeNode<K, P, D> implements Comparable<TreeNode<K, P, D>> {
 
     public void setChildren(TreeSet<TreeNode<K, P, D>> children) {
         this.children = children;
+    }
+
+    public boolean isLeaf() {
+        return isLeaf;
+    }
+
+    public void setLeaf(boolean leaf) {
+        isLeaf = leaf;
     }
 }

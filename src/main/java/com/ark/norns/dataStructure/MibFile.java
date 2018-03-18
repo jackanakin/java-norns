@@ -1,15 +1,13 @@
 package com.ark.norns.dataStructure;
 
 import com.ark.norns.entity._Entity;
-import org.hibernate.annotations.Formula;
+import javafx.util.Pair;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "mib_file")
@@ -22,6 +20,18 @@ public class MibFile extends _Entity implements Comparable {
 
     @Transient
     private Set<MibFile> dependencies = new HashSet<MibFile>();
+
+    @Transient
+    private Set<MibFile> unresolvedDependencies = new HashSet<>();
+
+    @Transient
+    private Map<String, Pair<String, Integer>> modules = new HashMap<>();
+
+    @Transient
+    private Map<String, Set<Pair<String, MibParsingSyntax>>> sequences;
+
+    @Transient
+    private Map<String, MibParsingSyntax> conventions;
 
     public MibFile() {
     }
@@ -87,5 +97,37 @@ public class MibFile extends _Entity implements Comparable {
 
     public void setDependencies(Set<MibFile> dependencies) {
         this.dependencies = dependencies;
+    }
+
+    public Set<MibFile> getUnresolvedDependencies() {
+        return unresolvedDependencies;
+    }
+
+    public void setUnresolvedDependencies(Set<MibFile> unresolvedDependencies) {
+        this.unresolvedDependencies = unresolvedDependencies;
+    }
+
+    public Map<String, Pair<String, Integer>> getModules() {
+        return modules;
+    }
+
+    public void setModules(Map<String, Pair<String, Integer>> modules) {
+        this.modules = modules;
+    }
+
+    public Map<String, Set<Pair<String, MibParsingSyntax>>> getSequences() {
+        return sequences;
+    }
+
+    public void setSequences(Map<String, Set<Pair<String, MibParsingSyntax>>> sequences) {
+        this.sequences = sequences;
+    }
+
+    public Map<String, MibParsingSyntax> getConventions() {
+        return conventions;
+    }
+
+    public void setConventions(Map<String, MibParsingSyntax> conventions) {
+        this.conventions = conventions;
     }
 }

@@ -5,6 +5,15 @@ public class MibFileOid {
     private String oid;
     private MibFile mibFile;
 
+    private MibParsingSyntax syntax;
+    private MibParsingAccess access;
+    private String description = "";
+
+    public MibFileOid(String identifier, MibFile mibFile) {
+        this.identifier = identifier;
+        this.mibFile = mibFile;
+    }
+
     public MibFileOid(String oid, String identifier, MibFile mibFile) {
         this.identifier = identifier;
         this.mibFile = mibFile;
@@ -33,6 +42,34 @@ public class MibFileOid {
 
     public void setMibFile(MibFile mibFile) {
         this.mibFile = mibFile;
+    }
+
+    public MibParsingSyntax getSyntax() {
+        return syntax;
+    }
+
+    public void setSyntax(MibParsingSyntax syntax) {
+        this.syntax = syntax;
+    }
+
+    public MibParsingAccess getAccess() {
+        return access;
+    }
+
+    public void setAccess(MibParsingAccess access) {
+        this.access = access;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void concatDescription(String s){
+        description = description + " " + s;
     }
 
     @Override

@@ -18,6 +18,11 @@ public class Properties {
     public static Long snmpWalkTimeout = null;
     public static String snmpWalkOidStart = null;
     public static Long snmpWalkVersion = null;
+    public static String mibFileRoot = null;
+
+    public static void setMibFileRoot(String mibFileRoot) {
+        Properties.mibFileRoot = mibFileRoot;
+    }
 
     public static void setSnmpWalkVersion(Long snmpWalkVersion) {
         Properties.snmpWalkVersion = snmpWalkVersion;
