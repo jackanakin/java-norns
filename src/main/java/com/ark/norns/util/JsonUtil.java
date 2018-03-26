@@ -35,7 +35,7 @@ public class JsonUtil {
         return "{}";
     }
 
-    public static synchronized String entityToJson(Object o) {
+    public static String entityToJson(Object o) {
         try {
             return mapper.writeValueAsString(o);
         } catch (JsonGenerationException e) {

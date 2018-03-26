@@ -118,7 +118,7 @@ public class DeviceController {
                 long duration = (endTime - startTime);
                 System.out.println(".:"+(duration/1000000));
             }catch (Exception e){
-                Logging.errorLog(this.getClass(), e.getMessage());
+                Logging.errorLog(this.getClass(), e.getCause() + ": "+e.getMessage());
             }
         }
         return null;

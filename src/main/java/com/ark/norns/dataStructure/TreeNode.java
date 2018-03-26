@@ -1,31 +1,86 @@
 package com.ark.norns.dataStructure;
 
+import com.fasterxml.jackson.annotation.*;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Queue;
+import java.util.Set;
 import java.util.TreeSet;
 
-public class TreeNode<K, P, D> implements Comparable<TreeNode<K, P, D>> {
+public class TreeNode<K, P, D> implements Comparable<TreeNode<K, P, D>>, Serializable {
+    @JsonIgnore
     D data;
-    K key;
-    P path;
-    int rank;
-    boolean isLeaf = false;
-    TreeNode<K, P, D> parent;
-    TreeSet<TreeNode<K, P, D>> children;
 
-    public TreeNode(K key, P path, D d, int r) {
-        this.rank = rank;
+    @JsonIgnore
+    K key;
+
+    P path;
+
+    @JsonIgnore
+    boolean isLeaf = false;
+
+    @JsonBackReference
+    TreeNode<K, P, D> parent;
+
+    @JsonManagedReference
+    TreeSet<TreeNode<K, P, D>> children = new TreeSet<>();
+
+    @JsonIgnore
+    Set<MibFile> mibFileComposition = new HashSet<>();
+
+    public TreeNode() {
+    }
+
+    public TreeNode(D data, P path, boolean isLeaf) {
+        this.data = data;
+        this.path = path;
+        this.isLeaf = isLeaf;
+    }
+
+    public TreeNode(K key, P path, D d) {
         this.data = d;
         this.key = key;
         this.path = path;
         this.children = new TreeSet<TreeNode<K, P, D>>();
     }
 
-    public TreeNode(K key, P path, D d, int r, boolean isLeaf) {
-        this.rank = rank;
+    public TreeNode(K key, P path, D d, boolean isLeaf, TreeNode<K, P, D> parent) {
         this.data = d;
         this.key = key;
         this.path = path;
         this.isLeaf = isLeaf;
         this.children = new TreeSet<TreeNode<K, P, D>>();
+        this.parent = parent;
+    }
+
+    public void addLeaf(Queue<Integer> queue, K key, P path, D data) {
+        Integer id = queue.poll();
+        if (queue.isEmpty()) {
+            this.children.add(new TreeNode<K, P, D>(key, path, data, true, this));
+            return;
+        }
+
+        if (this.parent == null) {
+            id = queue.poll();
+        }
+
+        for (TreeNode<K, P, D> node : this.children) {
+            if ((Integer) node.key == id) {
+                node.addLeaf(queue, key, path, data);
+                return;
+            }
+        }
+
+        this.children.add(new TreeNode<K, P, D>(key, path, data, true, this));
+    }
+
+    public void addMibFile(MibFile mibFile) {
+        this.mibFileComposition.add(mibFile);
+    }
+
+    public void addMibFile(Set<MibFile> mibFile) {
+        this.mibFileComposition.addAll(mibFile);
     }
 
     public TreeNode<K, P, D> addChildren(K k, P p, D d) {
@@ -36,22 +91,7 @@ public class TreeNode<K, P, D> implements Comparable<TreeNode<K, P, D>> {
         if (tNode != null) {
             return tNode;
         } else {
-            tNode = new TreeNode<K, P, D>(k, p, d, this.rank++);
-            tNode.parent = this;
-            this.children.add(tNode);
-            return tNode;
-        }
-    }
-
-    public TreeNode<K, P, D> addChildren(K k, P p, D d, boolean isLeaf) {
-        TreeNode<K, P, D> tNode = children.stream().filter(
-                node -> node.getKey() == k
-        ).findFirst().orElse(null);
-
-        if (tNode != null) {
-            return tNode;
-        } else {
-            tNode = new TreeNode<K, P, D>(k, p, d, this.rank++, isLeaf);
+            tNode = new TreeNode<K, P, D>(k, p, d);
             tNode.parent = this;
             this.children.add(tNode);
             return tNode;
@@ -117,6 +157,14 @@ public class TreeNode<K, P, D> implements Comparable<TreeNode<K, P, D>> {
 
     @Override
     public int compareTo(TreeNode<K, P, D> o) {
+        if (this.key == null && o.getKey() == null) {
+            return 0;
+        } else if (this.key == null) {
+            return 1;
+        } else if (o.getKey() == null) {
+            return -1;
+        }
+
         if ((Integer) this.key > (Integer) o.getKey()) {
             return 1;
         }
@@ -150,14 +198,6 @@ public class TreeNode<K, P, D> implements Comparable<TreeNode<K, P, D>> {
         this.path = path;
     }
 
-    public int getRank() {
-        return rank;
-    }
-
-    public void setRank(int rank) {
-        this.rank = rank;
-    }
-
     public TreeNode<K, P, D> getParent() {
         return parent;
     }
@@ -180,5 +220,13 @@ public class TreeNode<K, P, D> implements Comparable<TreeNode<K, P, D>> {
 
     public void setLeaf(boolean leaf) {
         isLeaf = leaf;
+    }
+
+    public Set<MibFile> getMibFileComposition() {
+        return mibFileComposition;
+    }
+
+    public void setMibFileComposition(Set<MibFile> mibFileComposition) {
+        this.mibFileComposition = mibFileComposition;
     }
 }

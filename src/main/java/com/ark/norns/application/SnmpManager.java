@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class SnmpManager {
@@ -31,11 +32,23 @@ public class SnmpManager {
     @Autowired
     private MibManager mibManager;
 
+    @Autowired
+    public SnmpManager(MibFileService mibFileService, MibManager mibManager) {
+        this.mibFileService = mibFileService;
+        this.mibManager = mibManager;
+    }
+
     public void translateVariableBindingIntoMibFileOid(List<VariableBinding> list) {
         List<MibFile> mibFiles = mibFileService.getMibFileDAO().getMibFileRepository().findAll(MibFileSpecification.translateVariableBindingIntoMibFileOid());
-        Collections.sort(mibFiles, MibFile.ROOT_OID_DESC);
-        TreeNode<Integer, String, MibFileOid> root = mibManager.initializeYggdrasil(new TreeNode(1, "1", new MibFileOid("1", "iso", new MibFile(Properties.mibFileRoot)), 0));
         Set<MibFile> cachedMibFile = new HashSet<>();
+        Queue<Integer> queue = new LinkedList<>();
+
+        Collections.sort(mibFiles, MibFile.ROOT_OID_DESC);
+        TreeNode<Integer, String, MibFileOid> root = mibManager.createRootTreeNode();
+        /*for (MibFile mibVar: root.getMibFileComposition()){
+            root = mibManager.listMibFileObjectType(mibVar, root); //ta voltando nulo em algum momento
+            cachedMibFile.add(mibVar);
+        }*/
 
         long start = System.currentTimeMillis();
         OID_LOOP:
@@ -44,7 +57,7 @@ public class SnmpManager {
                 if (var.getOid().toString().startsWith(mibVar.getRootOID())) {
                     // Carrega os identificadores dos arquivos mib necessários na àrvore
                     if (!cachedMibFile.contains(mibVar)){
-                        Set<MibFile> newCache = mibManager.loadMibIndexes(new HashSet<>(Arrays.asList(mibVar)), cachedMibFile, root);
+                        Set<MibFile> newCache = mibManager.loadMibIndexes(new HashSet<>(Arrays.asList(mibVar)), cachedMibFile, root, Properties.mibFilesPath);
                         if (newCache.size() > 0){
                             cachedMibFile.addAll(newCache);
                             if (cachedMibFile.contains(mibVar)) {
@@ -55,8 +68,13 @@ public class SnmpManager {
                             }
                         }
                     }
-
-                    return;
+                    if (cachedMibFile.contains(mibVar)){
+                        queue.clear();
+                        queue.addAll(Arrays.stream(var.getOid().toIntArray()).boxed().collect(Collectors.toList()));
+                        MibFileOid oid = new MibFileOid(mibVar, var.getOid().toString(), var.getVariable());
+                        root.addLeaf(queue, null, oid.getOid(), oid);
+                    }
+                    break;
                 }
             }
         }

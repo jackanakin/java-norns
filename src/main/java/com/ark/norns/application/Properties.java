@@ -19,6 +19,7 @@ public class Properties {
     public static String snmpWalkOidStart = null;
     public static Long snmpWalkVersion = null;
     public static String mibFileRoot = null;
+    public static String mandatoryMibFilesPath = null;
 
     public static void setMibFileRoot(String mibFileRoot) {
         Properties.mibFileRoot = mibFileRoot;
@@ -89,5 +90,9 @@ public class Properties {
 
     public static void setAllowedOrigin(String allowedOrigin) {
         Properties.allowedOrigin = allowedOrigin;
+    }
+
+    public static void setMandatoryMibFilesPath(String mandatoryMibFilesPath) {
+        Properties.mandatoryMibFilesPath = mandatoryMibFilesPath;
     }
 }

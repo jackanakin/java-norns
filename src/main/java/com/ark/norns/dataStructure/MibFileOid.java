@@ -8,6 +8,13 @@ public class MibFileOid {
     private MibParsingSyntax syntax;
     private MibParsingAccess access;
     private String description = "";
+    private Object value;
+
+    public MibFileOid(MibFile mibFile, String oid, Object value) {
+        this.oid = oid;
+        this.mibFile = mibFile;
+        this.value = value;
+    }
 
     public MibFileOid(String identifier, MibFile mibFile) {
         this.identifier = identifier;
@@ -70,6 +77,14 @@ public class MibFileOid {
 
     public void concatDescription(String s){
         description = description + " " + s;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
     }
 
     @Override

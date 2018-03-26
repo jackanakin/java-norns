@@ -1,22 +1,29 @@
 package com.ark.norns.dataStructure;
 
 import com.ark.norns.entity._Entity;
+import com.ark.norns.exception.PwdException;
 import javafx.util.Pair;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Entity
 @Table(name = "mib_file")
 public class MibFile extends _Entity implements Comparable {
+
+    @NotNull
     @Column(name = "file_name")
     private String fileName;
 
     @Column(name = "root_oid")
     private String rootOID;
+
+    @Transient
+    private String pwd;
 
     @Transient
     private Set<MibFile> dependencies = new HashSet<MibFile>();
@@ -36,13 +43,16 @@ public class MibFile extends _Entity implements Comparable {
     public MibFile() {
     }
 
-    public static final Comparator<MibFile> ROOT_OID_DESC =
-            new Comparator<MibFile>() {
-                public int compare(MibFile e1, MibFile e2) {
-                    return (e1.getRootOID().length() > e2.getRootOID().length() ? -1 :
-                            (e1.getRootOID().length() == e2.getRootOID().length() ? 0 : 1));
-                }
-            };
+    public MibFile(String fileName, String pwd) {
+        this.fileName = fileName;
+        this.pwd = pwd;
+    }
+
+    public MibFile(String fileName, String rootOID, String pwd) {
+        this.fileName = fileName;
+        this.rootOID = rootOID;
+        this.pwd = pwd;
+    }
 
     @Override
     public int compareTo(Object o) {
@@ -71,13 +81,13 @@ public class MibFile extends _Entity implements Comparable {
         return fileName.hashCode();
     }
 
-    public MibFile(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
+    public static final Comparator<MibFile> ROOT_OID_DESC =
+            new Comparator<MibFile>() {
+                public int compare(MibFile e1, MibFile e2) {
+                    return (e1.getRootOID().length() > e2.getRootOID().length() ? -1 :
+                            (e1.getRootOID().length() == e2.getRootOID().length() ? 0 : 1));
+                }
+            };
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
@@ -129,5 +139,21 @@ public class MibFile extends _Entity implements Comparable {
 
     public void setConventions(Map<String, MibParsingSyntax> conventions) {
         this.conventions = conventions;
+    }
+
+    public String getPwd() {
+        if (pwd == null || this.pwd.equals("")) {
+            throw new PwdException();
+        } else {
+            return pwd;
+        }
+    }
+
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 }
